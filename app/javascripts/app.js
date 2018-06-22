@@ -89,7 +89,20 @@ window.App = {
       console.log('123')
       var temp = md5('123')
       console.log(temp)
+    },
+    sendBlacklist: function() {
+      var blackIdcard = parseInt(document.getElementById("blackIdcard").value);
+      var blackIdcardMd5 = md5(blackIdcard)
+      console.log(blackIdcard)
+      console.log(blackIdcardMd5)
+    },
+    getBlacklistByIdcard: function() {
+      var idcard = parseInt(document.getElementById("idcard").value);
+      var idcardMd5 = md5(idcard)
+      console.log(idcard)
+      console.log(idcardMd5)
     }
+
 };
 
 window.addEventListener('load', function() {
