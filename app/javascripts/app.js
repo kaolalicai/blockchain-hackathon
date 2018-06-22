@@ -4,7 +4,8 @@ import "../stylesheets/app.css";
 // Import libraries we need.
 import { default as Web3 } from 'web3';
 import { default as contract } from 'truffle-contract'
-
+const md5 = require('md5')
+// import {default as MD5} from 'md5.js'
 // Import our contract artifacts and turn them into usable abstractions.
 import metacoin_artifacts from '../../build/contracts/MetaCoin.json'
 
@@ -83,6 +84,11 @@ window.App = {
             console.log(e);
             self.setStatus("Error sending coin; see log.");
         });
+    },
+    md5Test: function() {
+      console.log('123')
+      var temp = md5('123')
+      console.log(temp)
     }
 };
 
@@ -93,7 +99,7 @@ window.addEventListener('load', function() {
             // Use Mist/MetaMask's provider
         window.web3 = new Web3(web3.currentProvider);
     } else {
-        console.warn("No web3 detected. Falling back to http://127.0.0.1:9545. You should remove this fallback when you deploy live, as it's inherently insecure. Consider switching to Metamask for development. More info here: http://truffleframework.com/tutorials/truffle-and-metamask");
+        console.warn("No web3 detected. Falling back to http://127.0.0.1:8545. You should remove this fallback when you deploy live, as it's inherently insecure. Consider switching to Metamask for development. More info here: http://truffleframework.com/tutorials/truffle-and-metamask");
         // fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
         window.web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:8545"));
     }
