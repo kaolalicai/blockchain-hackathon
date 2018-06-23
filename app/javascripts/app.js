@@ -8,22 +8,25 @@ const md5 = require('md5')
 // import {default as MD5} from 'md5.js'
 // Import our contract artifacts and turn them into usable abstractions.
 import metacoin_artifacts from '../../build/contracts/MetaCoin.json'
-
+import simpleStorage_artifacts from '../../build/contracts/SimpleStorage.json'
 // MetaCoin is our usable abstraction, which we'll use through the code below.
 var MetaCoin = contract(metacoin_artifacts);
-
+var SimpleStorage = contract(simpleStorage_artifacts);
 // The following code is simple to show off interacting with your contracts.
 // As your needs grow you will likely need to change its form and structure.
 // For application bootstrapping, check out window.addEventListener below.
 var accounts;
 var account;
-
+function getBigNumber(bigNumber){
+  console.log('bigNumber ==>', bigNumber)
+  return bigNumber.c[0]
+}
 window.App = {
     start: function() {
         var self = this;
 
         // Bootstrap the MetaCoin abstraction for Use.
-        MetaCoin.setProvider(web3.currentProvider);
+        SimpleStorage.setProvider(web3.currentProvider);
 
         // Get the initial account balance so it can be displayed.
         web3.eth.getAccounts(function(err, accs) {
@@ -39,50 +42,8 @@ window.App = {
 
             accounts = accs;
             account = accounts[0];
-
-            self.refreshBalance();
-        });
-    },
-
-    setStatus: function(message) {
-        var status = document.getElementById("status");
-        status.innerHTML = message;
-    },
-
-    refreshBalance: function() {
-        var self = this;
-
-        var meta;
-        MetaCoin.deployed().then(function(instance) {
-            meta = instance;
-            return meta.getBalance.call(account, { from: account });
-        }).then(function(value) {
-            var balance_element = document.getElementById("balance");
-            balance_element.innerHTML = value.valueOf();
-        }).catch(function(e) {
-            console.log(e);
-            self.setStatus("Error getting balance; see log.");
-        });
-    },
-
-    sendCoin: function() {
-        var self = this;
-
-        var amount = parseInt(document.getElementById("amount").value);
-        var receiver = document.getElementById("receiver").value;
-
-        this.setStatus("Initiating transaction... (please wait)");
-
-        var meta;
-        MetaCoin.deployed().then(function(instance) {
-            meta = instance;
-            return meta.sendCoin(receiver, amount, { from: account });
-        }).then(function() {
-            self.setStatus("Transaction complete!");
-            self.refreshBalance();
-        }).catch(function(e) {
-            console.log(e);
-            self.setStatus("Error sending coin; see log.");
+            console.log('account ==>', account)
+            // self.refreshBalance();
         });
     },
     md5Test: function() {
@@ -91,16 +52,45 @@ window.App = {
       console.log(temp)
     },
     sendBlacklist: function() {
-      var blackIdcard = parseInt(document.getElementById("blackIdcard").value);
-      var blackIdcardMd5 = md5(blackIdcard)
+      var self = this;
+      var bankCardNo = document.getElementById("bankCardNo").value;
+      var name = document.getElementById("name").value;
+      var idCardNo = document.getElementById("idCardNo").value;
+      var phone = document.getElementById("phone").value;
+      var amount = parseInt(document.getElementById("amount").value);
+      var repayStatus = document.getElementById("repayStatus").value;
+      // var blackIdcardMd5 = md5(blackIdcard)
       console.log(blackIdcard)
       console.log(blackIdcardMd5)
+      SimpleStorage.deployed().then(function(contractInstance) {
+          // contractInstance.sayHello({gas: 140000, from: web3.eth.accounts[0]})
+          contractInstance.set(idCardNo, name, bankCardNo, phone, amount, repayStatus, {gas: 1400000, from: web3.eth.accounts[0]}).then(function(ret) {
+            console.log('ret ==>', ret)
+          })
+      }).then(function() {
+        console.log('ok');
+      }).catch(function(e) {
+          console.log('err =>', e);
+      });
     },
     getBlacklistByIdcard: function() {
-      var idcard = parseInt(document.getElementById("idcard").value);
-      var idcardMd5 = md5(idcard)
+      var idcard = document.getElementById("idCardNoCheck").value;
+      // var idcardMd5 = md5(idcard)
       console.log(idcard)
-      console.log(idcardMd5)
+      // console.log(idcardMd5)
+      SimpleStorage.deployed().then(function(contractInstance) {
+          // contractInstance.sayHello({gas: 140000, from: web3.eth.accounts[0]})
+          contractInstance.get(idcard, {from: web3.eth.accounts[0]}).then(function(ret) {
+            console.log('ret ==>', ret)
+            console.log('ret[0] ==>', ret[0])
+            console.log('ret[1] ==>', ret[1])
+            console.log('ret[2] ==>', getBigNumber(ret[2]))
+          })
+      }).then(function() {
+        console.log('ok');
+      }).catch(function(e) {
+          console.log('err =>', e);
+      });
     }
 
 };
