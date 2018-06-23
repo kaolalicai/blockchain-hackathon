@@ -10,4 +10,8 @@ contract BloggerCoin is StandardToken {
     /* totalSupply = INITIAL_SUPPLY; */
     balances[msg.sender] = INITIAL_SUPPLY;
   }
+  /* function Transfer (address A, uint256 x) public returns (bool){
+    transfer(A,x);
+    return true;
+  } */
 }

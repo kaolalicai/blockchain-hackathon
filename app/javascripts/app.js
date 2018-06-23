@@ -4,11 +4,13 @@ import "../stylesheets/app.css";
 // Import libraries we need.
 import { default as Web3 } from 'web3';
 import { default as contract } from 'truffle-contract'
+const objectId = require("bson-objectid")
 const md5 = require('md5')
 // import {default as MD5} from 'md5.js'
 // Import our contract artifacts and turn them into usable abstractions.
 import metacoin_artifacts from '../../build/contracts/MetaCoin.json'
 import simpleStorage_artifacts from '../../build/contracts/SimpleStorage.json'
+import BloggerCoin_artifacts from '../../build/contracts/BloggerCoin.json'
 // MetaCoin is our usable abstraction, which we'll use through the code below.
 var MetaCoin = contract(metacoin_artifacts);
 var SimpleStorage = contract(simpleStorage_artifacts);
@@ -21,6 +23,18 @@ function getBigNumber(bigNumber){
   console.log('bigNumber ==>', bigNumber)
   return bigNumber.c[0]
 }
+// function creatTable(data){
+// //这个函数的参数可以是从后台传过来的也可以是从其他任何地方传过来的
+// //这里我假设这个data是一个长度为5的字符串数组 我要把他放在表格的一行里面，分成五列
+//   var tableData="<tr>"
+//   //动态增加5个td,并且把data数组的五个值赋给每个td
+//   for(var i=0;i<data.length;i++){
+//   tableData+="<td>"+data[i]+"</td>"
+//   }
+//   tableData+="</tr>"
+//   //现在tableData已经生成好了，把他赋值给上面的tbody
+//   $("#tbody1").html(tableData)
+// }
 window.App = {
     start: function() {
         var self = this;
@@ -43,6 +57,7 @@ window.App = {
             accounts = accs;
             account = accounts[0];
             console.log('account ==>', account)
+            console.log('coinbase ==>', web3.eth.coinbase)
             // self.refreshBalance();
         });
     },
@@ -59,12 +74,19 @@ window.App = {
       var phone = document.getElementById("phone").value;
       var amount = parseInt(document.getElementById("amount").value);
       var repayStatus = document.getElementById("repayStatus").value;
+      var loanId = objectId().toString();
+      var peroidDay = document.getElementById("peroidDay").value;
       // var blackIdcardMd5 = md5(blackIdcard)
       // console.log(blackIdcard)
       // console.log(blackIdcardMd5)
+      console.log('loanId ==>', loanId)
+      console.log('coinbase ==>', web3.eth.coinbase)
+      console.log('account ==>', account)
       SimpleStorage.deployed().then(function(contractInstance) {
           // contractInstance.sayHello({gas: 140000, from: web3.eth.accounts[0]})
-          contractInstance.set(idCardNo, name, bankCardNo, phone, amount, repayStatus, {gas: 1400000, from: web3.eth.accounts[0]}).then(function(ret) {
+          // loanTime
+          // peroidDay =
+          contractInstance.set(accounts[1], idCardNo, name, bankCardNo, phone, loanId, amount,new Date().toString(),  peroidDay, repayStatus, {gas: 1400000, from: web3.eth.coinbase}).then(function(ret) {
             console.log('ret ==>', ret)
           })
       }).then(function() {
@@ -79,24 +101,33 @@ window.App = {
       console.log(idcard)
       // console.log(idcardMd5)
       SimpleStorage.deployed().then(function(contractInstance) {
-          // contractInstance.sayHello({gas: 140000, from: web3.eth.accounts[0]})
-          contractInstance.get(idcard, {from: web3.eth.accounts[0]}).then(function(ret) {
-            console.log('ret ==>', ret)
-            console.log('ret[0] ==>', ret[0])
-            console.log('ret[1] ==>', ret[1])
-            let name = ret[1]
-            let amount = getBigNumber(ret[2])
-            console.log('amount ==>', amount)
-            document.getElementById("gName").value = name
-            document.getElementById("gAmount").value = amount
+          contractInstance.getLoanCount(accounts[1], idcard,{from: web3.eth.accounts[0]}).then(function(loanCount){
+            console.log('loanCount ==>', loanCount)
+            // console.log('loanCount ==>', getBigNumber(loanCount))
+            var loans = getBigNumber(loanCount)
+            // loanCount = getBigNumber(loanCount)
+            console.log('loans ==>', loans)
+            if (loans){
+              for(var i = 0;i<loans;i++){
+                contractInstance.get(accounts[1], idcard, i, {from: web3.eth.accounts[0]}).then(function(ret) {
+                  console.log('ret ==>', ret)
+                  // console.log('ret[0] ==>', ret[0])
+                  // console.log('ret[1] ==>', ret[1])
+                  // let name = ret[1]
+                  // let amount = getBigNumber(ret[2])
+                  // console.log('amount ==>', amount)
+                  // document.getElementById("gName").value = name
+                  // document.getElementById("gAmount").value = amount
+                })
+              }
+            }
           })
       }).then(function() {
         console.log('ok');
       }).catch(function(e) {
           console.log('err =>', e);
       });
-    }
-
+    },
 };
 
 window.addEventListener('load', function() {
