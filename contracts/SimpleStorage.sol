@@ -24,20 +24,27 @@ contract SimpleStorage is StandardToken {
         // mapping (string => LoanStruct) loan;
     }
     mapping(string => UserStruct) private UserStructs;
-    /* address BloggerCoinAddress; */
     string public name = "BloggerCoin";
     string public symbol = "BLC";
     uint8 public decimals = 4;
     uint256 public INITIAL_SUPPLY = 1000000;
     function SimpleStorage(){
       balances[msg.sender] = INITIAL_SUPPLY;
-      /* BloggerCoinAddress = _bloggerCoinAddress; */
     }
+
+    struct BlackList {
+        address provider;
+        string name;
+        string bankCardNo;//md5
+        string idCardNo;//md5
+        string phone;//md5
+    }
+    mapping(string => BlackList) private BlackLists;
     // string[] private IdList;
     //存入
     //return 0/1
     function set(address provider, string idCardNo, string name, string bankCardNo, string phone, string loanid, uint amount, string loanTime, uint peroidDay, string repayStatus) public returns (bool) {
-        /* BloggerCoin bCoin = BloggerCoin(BloggerCoinAddress); */
+        //todo : if not md5 return false;
         UserStructs[idCardNo].provider = provider;
         UserStructs[idCardNo].name = name;
         UserStructs[idCardNo].idCardNo = idCardNo;
@@ -70,14 +77,25 @@ contract SimpleStorage is StandardToken {
     }
     //是否在黑名单 string idCardNo
     //return true/false
-    function isInBlackList(string idCardNo) public pure returns (bool isIn) {
+    function isInBlackList(string idCardNo) public view returns (bool isIn) {
         //todo: query then return
+        if (compareStrings(BlackLists[idCardNo].idCardNo , "")) {
+            return false;
+        }
         return true;
+    }
+    function compareStrings (string a, string b) view returns (bool) {
+       return keccak256(a) == keccak256(b);
     }
     //添加黑名单
     //参数可以为空，但不全为空
-    function setBlackList(string idCardNo, string bankCardNo, string phone) public returns(bool) {
-        //todo: query then return
+    function setBlackList(address provider, string idCardNo, string name, string bankCardNo, string phone) public returns(bool) {
+        //todo : if not md5 return false;
+        BlackLists[idCardNo].provider = provider;
+        BlackLists[idCardNo].name = name;
+        BlackLists[idCardNo].idCardNo = idCardNo;
+        BlackLists[idCardNo].bankCardNo = bankCardNo;
+        BlackLists[idCardNo].phone = phone;
         return true;
     }
     //client confirm all loanorder
@@ -85,5 +103,6 @@ contract SimpleStorage is StandardToken {
         UserStructs[idCardNo].isLoansConfirmedByClient = true;
         return true;
     }
+
 
 }
