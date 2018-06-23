@@ -60,8 +60,8 @@ window.App = {
       var amount = parseInt(document.getElementById("amount").value);
       var repayStatus = document.getElementById("repayStatus").value;
       // var blackIdcardMd5 = md5(blackIdcard)
-      console.log(blackIdcard)
-      console.log(blackIdcardMd5)
+      // console.log(blackIdcard)
+      // console.log(blackIdcardMd5)
       SimpleStorage.deployed().then(function(contractInstance) {
           // contractInstance.sayHello({gas: 140000, from: web3.eth.accounts[0]})
           contractInstance.set(idCardNo, name, bankCardNo, phone, amount, repayStatus, {gas: 1400000, from: web3.eth.accounts[0]}).then(function(ret) {
