@@ -84,7 +84,11 @@ window.App = {
             console.log('ret ==>', ret)
             console.log('ret[0] ==>', ret[0])
             console.log('ret[1] ==>', ret[1])
-            console.log('ret[2] ==>', getBigNumber(ret[2]))
+            let name = ret[1]
+            let amount = getBigNumber(ret[2])
+            console.log('amount ==>', amount)
+            document.getElementById("gName").value = name
+            document.getElementById("gAmount").value = amount
           })
       }).then(function() {
         console.log('ok');
