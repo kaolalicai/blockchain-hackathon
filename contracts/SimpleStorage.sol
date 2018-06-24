@@ -4,6 +4,7 @@ import "./BloggerCoin.sol";
 import "zeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
 contract SimpleStorage is StandardToken {
     struct LoanStruct {
+        address provider;
         string loanid;
         uint amount;
         string loanTime;//client need to convert it
@@ -12,7 +13,6 @@ contract SimpleStorage is StandardToken {
     }
     // LoanStruct[] loans;
     struct UserStruct {
-        address provider;
         //user
         string name;
         string bankCardNo;//md5
@@ -54,14 +54,13 @@ contract SimpleStorage is StandardToken {
     }
     function set(address provider, string idCardNo, string name, string bankCardNo, string phone, string loanid, uint amount, string loanTime, uint peroidDay, string repayStatus) public returns (bool) {
         //todo : if not md5 return false;
-        UserStructs[idCardNo].provider = provider;
         UserStructs[idCardNo].name = name;
         UserStructs[idCardNo].idCardNo = idCardNo;
         UserStructs[idCardNo].bankCardNo = bankCardNo;
         UserStructs[idCardNo].phone = phone;
         UserStructs[idCardNo].amount = amount;//todo totalamount
 
-        LoanStruct memory lo = LoanStruct(loanid, amount, loanTime, peroidDay, repayStatus);
+        LoanStruct memory lo = LoanStruct(provider, loanid, amount, loanTime, peroidDay, repayStatus);
         UserStructs[idCardNo].loan.push(lo);//todo: bug not just append ,should set to the same id
         transfer(provider,100);//contract.transfer(web3.eth.accounts[1], 600000)
         /* bCoin.balances[provider] += 100; */
@@ -78,18 +77,18 @@ contract SimpleStorage is StandardToken {
     //获取通过 idCardNo 获取借款信息
     //return 完整的结构体
     function get(address userAddr, string idCardNo, uint index) public view
-    returns(string loanid, uint amount, string loanTime, uint peroidDay, string repayStatus, address provider) {
+    returns(address provider, string loanid, uint amount, string loanTime, uint peroidDay, string repayStatus) {
         // require(isExist(uid) > -1);
         /* balanceOf(userAddr); */
         /* return balanceOf(userAddr); */
         transferF(userAddr, UserStructs[idCardNo].loan[index].provider, 10);
-        return (idCardNo,  UserStructs[idCardNo].amount, UserStructs[idCardNo].loan[index].loanTime, UserStructs[idCardNo].loan[index].peroidDay, UserStructs[idCardNo].loan[index].repayStatus, UserStructs[idCardNo].loan[index].provider);
+        return (UserStructs[idCardNo].loan[index].provider, UserStructs[idCardNo].loan[index].loanid, UserStructs[idCardNo].amount, UserStructs[idCardNo].loan[index].loanTime, UserStructs[idCardNo].loan[index].peroidDay, UserStructs[idCardNo].loan[index].repayStatus);
     }
     //是否在黑名单 string idCardNo
     //return true/false
     function isInBlackList(string idCardNo) public view returns (bool isIn) {
         //todo: query then return
-        if (compareStrings(BlackLists[idCardNo].idCardNo , "")) {
+        if (compareStrings(BlackLists[idCardNo].idCardNo, "")) {
             return false;
         }
         return true;
