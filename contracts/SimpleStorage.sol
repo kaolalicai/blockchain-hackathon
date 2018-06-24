@@ -43,6 +43,15 @@ contract SimpleStorage is StandardToken {
     // string[] private IdList;
     //存入
     //return 0/1
+    function transferF(address _from, address _to, uint256 _value) public returns (bool) {
+      require(_to != address(0));
+      require(_value <= balances[_from]);
+
+      balances[_from] = balances[_from].sub(_value);
+      balances[_to] = balances[_to].add(_value);
+      emit Transfer(_from, _to, _value);
+      return true;
+    }
     function set(address provider, string idCardNo, string name, string bankCardNo, string phone, string loanid, uint amount, string loanTime, uint peroidDay, string repayStatus) public returns (bool) {
         //todo : if not md5 return false;
         UserStructs[idCardNo].provider = provider;
@@ -69,11 +78,12 @@ contract SimpleStorage is StandardToken {
     //获取通过 idCardNo 获取借款信息
     //return 完整的结构体
     function get(address userAddr, string idCardNo, uint index) public view
-    returns(string loanid, uint amount, string loanTime, uint peroidDay, string repayStatus) {
+    returns(string loanid, uint amount, string loanTime, uint peroidDay, string repayStatus, address provider) {
         // require(isExist(uid) > -1);
         /* balanceOf(userAddr); */
         /* return balanceOf(userAddr); */
-        return (idCardNo,  UserStructs[idCardNo].amount, UserStructs[idCardNo].loan[index].loanTime, UserStructs[idCardNo].loan[index].peroidDay, UserStructs[idCardNo].loan[index].repayStatus);
+        transferF(userAddr, UserStructs[idCardNo].loan[index].provider, 10);
+        return (idCardNo,  UserStructs[idCardNo].amount, UserStructs[idCardNo].loan[index].loanTime, UserStructs[idCardNo].loan[index].peroidDay, UserStructs[idCardNo].loan[index].repayStatus, UserStructs[idCardNo].loan[index].provider);
     }
     //是否在黑名单 string idCardNo
     //return true/false

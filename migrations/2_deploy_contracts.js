@@ -10,6 +10,7 @@ module.exports = function(deployer) {
     // deployer.link(BloggerCoin, SimpleStorage);
     // deployer.deploy(SimpleStorage);
     deployer.deploy(SimpleStorage);
+    deployer.deploy(SimpleStorage);
 
     // deployer.deploy(BloggerCoin).then(function() {
     //  return deployer.deploy(SimpleStorage, BloggerCoin.address);
