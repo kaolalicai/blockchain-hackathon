@@ -53,7 +53,7 @@ contract SimpleStorage is StandardToken {
     function getLoanCount(address userAddr, string idCardNo) public view returns (uint) {
         if(balanceOf(userAddr) > 0)
             return UserStructs[idCardNo].loan.length;
-        return uint(-1);
+        return 0;
     }
     //存入
     //return 0/1
@@ -70,23 +70,18 @@ contract SimpleStorage is StandardToken {
         UserStructs[idCardNo].loan.push(lo);//todo: bug not just append ,should set to the same id
         
         uploadBonus(provider);
-        agreementSettle(idCardNo, provider, repayStatus);
+        // agreementSettle(idCardNo, provider, repayStatus);
         return true;
     }
     //获取通过 idCardNo 获取借款信息
     //return 完整的结构体
-    function get(address userAddr, string idCardNo, uint index) public
-    returns(address provider, string loanid, uint amount, string loanTime, uint peroidDay, string repayStatus) {
-        transferF(userAddr, UserStructs[idCardNo].loan[index].provider, 10);
-        return (UserStructs[idCardNo].loan[index].provider, UserStructs[idCardNo].loan[index].loanid, UserStructs[idCardNo].amount, UserStructs[idCardNo].loan[index].loanTime, UserStructs[idCardNo].loan[index].peroidDay, UserStructs[idCardNo].loan[index].repayStatus);
+    function get(address userAddr, string idCardNo, uint index) 
+    public returns(address provider, string loanid, uint amount, 
+    string loanTime, uint peroidDay, string repayStatus) {
+        LoanStruct lo = UserStructs[idCardNo].loan[index];
+        // downloadCost(userAddr, lo.provider);
+        return (lo.provider, lo.loanid, UserStructs[idCardNo].amount, lo.loanTime, lo.peroidDay, lo.repayStatus);
     }
-    // function get(address userAddr, string idCardNo, uint index) 
-    // public returns(address provider, string loanid, uint amount, 
-    // string loanTime, uint peroidDay, string repayStatus) {
-    //     LoanStruct lo = UserStructs[idCardNo].loan[index];
-    //     // downloadCost(userAddr, lo.provider);
-    //     return (lo.provider, lo.loanid, UserStructs[idCardNo].amount, lo.loanTime, lo.peroidDay, lo.repayStatus);
-    // }
     //是否在黑名单 string idCardNo
     //return true/false
     function isInBlackList(string idCardNo) public view returns (bool) {
