@@ -19,6 +19,7 @@ var SimpleStorage = contract(simpleStorage_artifacts);
 // For application bootstrapping, check out window.addEventListener below.
 var accounts;
 var account;
+var providerAccount;
 function getBigNumber(bigNumber){
   // console.log('bigNumber ==>', bigNumber)
   return bigNumber.c[0]
@@ -58,13 +59,8 @@ window.App = {
             account = accounts[0];
             console.log('account ==>', account)
             console.log('coinbase ==>', web3.eth.coinbase)
-            // SimpleStorage.deployed().then(function(contractInstance) {
-            //   contractInstance.transferF(web3.eth.coinbase, accs[1], 100).then(function(){
-            //     // console.log('balance =>', getBigNumber(balance));
-            //   })
-            //   // contractInstance.transfer(accounts[2], 10000)
-            // })
-
+            providerAccount = accounts[1];
+            document.getElementById("accountAddr").value = providerAccount
             // self.refreshBalance();
         });
     },
@@ -98,14 +94,17 @@ window.App = {
       console.log('loanId ==>', loanId)
       console.log('coinbase ==>', web3.eth.coinbase)
       console.log('account ==>', account)
+      // var providerAccount = accounts[1]
+      document.getElementById("accountAddr").value = providerAccount
       SimpleStorage.deployed().then(function(contractInstance) {
           // contractInstance.sayHello({gas: 140000, from: web3.eth.accounts[0]})
           // loanTime
           // peroidDay =
-          contractInstance.set(accounts[1], idCardNo, name, bankCardNo, phone, loanId, amount,new Date().toString(),  peroidDay, repayStatus, {gas: 1400000, from: web3.eth.coinbase}).then(function(ret) {
+          contractInstance.set(providerAccount, idCardNo, name, bankCardNo, phone, loanId, amount,new Date().toString(),  peroidDay, repayStatus, {gas: 1400000, from: web3.eth.coinbase}).then(function(ret) {
             console.log('ret ==>', ret)
-            contractInstance.balanceOf(web3.eth.coinbase).then(function(balance){
-              console.log('balance =>', getBigNumber(balance));
+            contractInstance.balanceOf(providerAccount).then(function(balance){
+              document.getElementById("accountBalance").value = getBigNumber(balance)
+              // console.log('balance =>', getBigNumber(balance));
             })
           })
       }).then(function() {
@@ -133,6 +132,7 @@ window.App = {
                   console.log('ret ==>', ret)
                   contractInstance.balanceOf(userAccount).then(function(balance){
                     console.log(userAccount, 'balance =>', getBigNumber(balance));
+                    document.getElementById("userBalance").value = getBigNumber(balance)
                   })
                 })
               }
