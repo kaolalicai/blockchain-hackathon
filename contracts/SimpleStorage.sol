@@ -76,7 +76,7 @@ contract SimpleStorage is StandardToken {
     }
     //获取通过 idCardNo 获取借款信息
     //return 完整的结构体
-    function get(address userAddr, string idCardNo, uint index) public view
+    function get(address userAddr, string idCardNo, uint index) public
     returns(address provider, string loanid, uint amount, string loanTime, uint peroidDay, string repayStatus) {
         // require(isExist(uid) > -1);
         /* balanceOf(userAddr); */
