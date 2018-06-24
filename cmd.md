@@ -11,13 +11,14 @@ contract.set("440184", "Wade", "6227", "186", 1000, "repaying" )
 contract.set("440184", "Wade", "6227", "186", '5d0', 1000, "repaying" )
 contract.set("0x555", "440184", "Wade", "6227", "186", "5d0", 1000, "2018-06-23T09:07:57" , 60, "repaying" )
 
-contract.setBlackList("0x555", "440184", "Wade", "6227", "186")
+contract.setBlackList("0xcf1149c7008b411ff6d9f927f916c93dbd4002b9", "440184", "Wade", "6227", "186")
 contract.isInBlackList("440184")
 contract.isInBlackList("440185")
 
 > contract.get(1)
 contract.get("440184", 1)
-contract.getLoanCount("440184")
+contract.get("0x666149c7008b411ff6d9f927f916c93dbd4002b9","440184", 0)
+contract.getLoanCount("0x666149c7008b411ff6d9f927f916c93dbd4002b9", "440184")
 
 ### FAQ
 Error: VM Exception while processing transaction: invalid opcode

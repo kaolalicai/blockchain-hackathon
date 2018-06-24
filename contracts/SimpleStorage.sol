@@ -70,13 +70,13 @@ contract SimpleStorage is StandardToken {
         UserStructs[idCardNo].loan.push(lo);//todo: bug not just append ,should set to the same id
         
         uploadBonus(provider);
-        // agreementSettle(idCardNo, provider, repayStatus);
+        agreementSettle(idCardNo, provider, repayStatus);
         return true;
     }
     //获取通过 idCardNo 获取借款信息
     //return 完整的结构体
     function get(address userAddr, string idCardNo, uint index) 
-    public returns(address provider, string loanid, uint amount, 
+    public view returns(address provider, string loanid, uint amount, 
     string loanTime, uint peroidDay, string repayStatus) {
         LoanStruct lo = UserStructs[idCardNo].loan[index];
         // downloadCost(userAddr, lo.provider);
