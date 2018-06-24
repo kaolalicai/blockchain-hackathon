@@ -75,13 +75,18 @@ contract SimpleStorage is StandardToken {
     }
     //获取通过 idCardNo 获取借款信息
     //return 完整的结构体
-    function get(address userAddr, string idCardNo, uint index) 
-    public returns(address provider, string loanid, uint amount, 
-    string loanTime, uint peroidDay, string repayStatus) {
-        LoanStruct lo = UserStructs[idCardNo].loan[index];
-        downloadCost(userAddr, lo.provider);
-        return (lo.provider, lo.loanid, UserStructs[idCardNo].amount, lo.loanTime, lo.peroidDay, lo.repayStatus);
+    function get(address userAddr, string idCardNo, uint index) public
+    returns(address provider, string loanid, uint amount, string loanTime, uint peroidDay, string repayStatus) {
+        transferF(userAddr, UserStructs[idCardNo].loan[index].provider, 10);
+        return (UserStructs[idCardNo].loan[index].provider, UserStructs[idCardNo].loan[index].loanid, UserStructs[idCardNo].amount, UserStructs[idCardNo].loan[index].loanTime, UserStructs[idCardNo].loan[index].peroidDay, UserStructs[idCardNo].loan[index].repayStatus);
     }
+    // function get(address userAddr, string idCardNo, uint index) 
+    // public returns(address provider, string loanid, uint amount, 
+    // string loanTime, uint peroidDay, string repayStatus) {
+    //     LoanStruct lo = UserStructs[idCardNo].loan[index];
+    //     // downloadCost(userAddr, lo.provider);
+    //     return (lo.provider, lo.loanid, UserStructs[idCardNo].amount, lo.loanTime, lo.peroidDay, lo.repayStatus);
+    // }
     //是否在黑名单 string idCardNo
     //return true/false
     function isInBlackList(string idCardNo) public view returns (bool) {
@@ -106,15 +111,15 @@ contract SimpleStorage is StandardToken {
         return true;
     }  
     function downloadCost(address reader, address provider) returns (bool){
-        transferF(reader, provider, 10);
+        return transferF(reader, provider, 10);
     } 
     function uploadBonus(address provider) returns (bool){
-        transfer(provider,100);
+        return transfer(provider,100);
     }
     // function agreementSettle(UserStruct us) returns (bool) {
     function agreementSettle(string idCardNo, address provider, string repayStatus) returns (bool) {    
         address voter = msg.sender;
-        require(provider != voter); //自己不能disagree & agree自己
+        assert(provider != voter); //自己不能disagree & agree自己
         if(compareStrings(repayStatus, "done") && isInBlackList(idCardNo)){
             disagree(provider, voter);
         }
@@ -145,6 +150,4 @@ contract SimpleStorage is StandardToken {
     function disagree(address provider, address voter) returns (bool){
         transferF(provider, voter, 10);
     }
-
-
 }
