@@ -20,7 +20,7 @@ var SimpleStorage = contract(simpleStorage_artifacts);
 var accounts;
 var account;
 function getBigNumber(bigNumber){
-  console.log('bigNumber ==>', bigNumber)
+  // console.log('bigNumber ==>', bigNumber)
   return bigNumber.c[0]
 }
 // function creatTable(data){
@@ -58,6 +58,13 @@ window.App = {
             account = accounts[0];
             console.log('account ==>', account)
             console.log('coinbase ==>', web3.eth.coinbase)
+            // SimpleStorage.deployed().then(function(contractInstance) {
+            //   contractInstance.transferF(web3.eth.coinbase, accs[1], 100).then(function(){
+            //     // console.log('balance =>', getBigNumber(balance));
+            //   })
+            //   // contractInstance.transfer(accounts[2], 10000)
+            // })
+
             // self.refreshBalance();
         });
     },
@@ -65,6 +72,15 @@ window.App = {
       console.log('123')
       var temp = md5('123')
       console.log(temp)
+    },
+    balanceInit: function() {
+      SimpleStorage.deployed().then(function(contractInstance) {
+        console.log('web3.eth.coinbase===============>', web3.eth.coinbase)
+        contractInstance.transferF(web3.eth.coinbase, web3.eth.coinbase, 100).then(function(){
+          // console.log('balance =>', getBigNumber(balance));
+        })
+        // contractInstance.transfer(accounts[2], 10000)
+      })
     },
     sendBlacklist: function() {
       var self = this;
@@ -88,6 +104,9 @@ window.App = {
           // peroidDay =
           contractInstance.set(accounts[1], idCardNo, name, bankCardNo, phone, loanId, amount,new Date().toString(),  peroidDay, repayStatus, {gas: 1400000, from: web3.eth.coinbase}).then(function(ret) {
             console.log('ret ==>', ret)
+            contractInstance.balanceOf(web3.eth.coinbase).then(function(balance){
+              console.log('balance =>', getBigNumber(balance));
+            })
           })
       }).then(function() {
         console.log('ok');
@@ -100,8 +119,9 @@ window.App = {
       // var idcardMd5 = md5(idcard)
       console.log(idcard)
       // console.log(idcardMd5)
+      var userAccount = accounts[2]
       SimpleStorage.deployed().then(function(contractInstance) {
-          contractInstance.getLoanCount(accounts[1], idcard,{from: web3.eth.accounts[0]}).then(function(loanCount){
+          contractInstance.getLoanCount(userAccount, idcard,{from: web3.eth.accounts[0]}).then(function(loanCount){
             console.log('loanCount ==>', loanCount)
             // console.log('loanCount ==>', getBigNumber(loanCount))
             var loans = getBigNumber(loanCount)
@@ -109,20 +129,17 @@ window.App = {
             console.log('loans ==>', loans)
             if (loans){
               for(var i = 0;i<loans;i++){
-                contractInstance.get(accounts[1], idcard, i, {from: web3.eth.accounts[0]}).then(function(ret) {
+                contractInstance.get(userAccount, idcard, i, {from: web3.eth.accounts[0]}).then(function(ret) {
                   console.log('ret ==>', ret)
-                  // console.log('ret[0] ==>', ret[0])
-                  // console.log('ret[1] ==>', ret[1])
-                  // let name = ret[1]
-                  // let amount = getBigNumber(ret[2])
-                  // console.log('amount ==>', amount)
-                  // document.getElementById("gName").value = name
-                  // document.getElementById("gAmount").value = amount
+                  contractInstance.balanceOf(userAccount).then(function(balance){
+                    console.log(userAccount, 'balance =>', getBigNumber(balance));
+                  })
                 })
               }
             }
           })
       }).then(function() {
+
         console.log('ok');
       }).catch(function(e) {
           console.log('err =>', e);
