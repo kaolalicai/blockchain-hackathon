@@ -40,7 +40,7 @@ contract SimpleStorage is StandardToken {
         string idCardNo;//md5
         string phone;//md5
     }
-    mapping(string => BlackList) private BlackLists;    
+    mapping(string => BlackList) private BlackLists;
     function transferF(address _from, address _to, uint256 _value) public returns (bool) {
       require(_to != address(0));
       require(_value <= balances[_from]);
@@ -49,7 +49,7 @@ contract SimpleStorage is StandardToken {
       balances[_to] = balances[_to].add(_value);
       emit Transfer(_from, _to, _value);
       return true;
-    }    
+    }
     function getLoanCount(address userAddr, string idCardNo) public view returns (uint) {
         if(balanceOf(userAddr) > 0)
             return UserStructs[idCardNo].loan.length;
@@ -68,15 +68,15 @@ contract SimpleStorage is StandardToken {
 
         LoanStruct memory lo = LoanStruct(provider, loanid, amount, loanTime, peroidDay, repayStatus);
         UserStructs[idCardNo].loan.push(lo);//todo: bug not just append ,should set to the same id
-        
+
         uploadBonus(provider);
-        // agreementSettle(idCardNo, provider, repayStatus);
+        agreementSettle(idCardNo, provider, repayStatus);
         return true;
     }
     //获取通过 idCardNo 获取借款信息
     //return 完整的结构体
-    function get(address userAddr, string idCardNo, uint index) 
-    public returns(address provider, string loanid, uint amount, 
+    function get(address userAddr, string idCardNo, uint index)
+    public view returns(address provider, string loanid, uint amount,
     string loanTime, uint peroidDay, string repayStatus) {
         LoanStruct lo = UserStructs[idCardNo].loan[index];
         // downloadCost(userAddr, lo.provider);
@@ -95,7 +95,7 @@ contract SimpleStorage is StandardToken {
     }
     //添加黑名单
     //参数可以为空，但不全为空
-    function setBlackList(address provider, string idCardNo, string name, string bankCardNo, string phone) 
+    function setBlackList(address provider, string idCardNo, string name, string bankCardNo, string phone)
     public returns(bool) {
         //todo : if not md5 return false;
         BlackLists[idCardNo].provider = provider;
@@ -104,15 +104,15 @@ contract SimpleStorage is StandardToken {
         BlackLists[idCardNo].bankCardNo = bankCardNo;
         BlackLists[idCardNo].phone = phone;
         return true;
-    }  
+    }
     function downloadCost(address reader, address provider) returns (bool){
         return transferF(reader, provider, 10);
-    } 
+    }
     function uploadBonus(address provider) returns (bool){
         return transfer(provider,100);
     }
     // function agreementSettle(UserStruct us) returns (bool) {
-    function agreementSettle(string idCardNo, address provider, string repayStatus) returns (bool) {    
+    function agreementSettle(string idCardNo, address provider, string repayStatus) returns (bool) {
         address voter = msg.sender;
         assert(provider != voter); //自己不能disagree & agree自己
         if(compareStrings(repayStatus, "done") && isInBlackList(idCardNo)){
@@ -121,7 +121,7 @@ contract SimpleStorage is StandardToken {
         else if(compareStrings(repayStatus, "overdue") && isInBlackList(idCardNo)) {
             agree(provider, voter);
         }
-    } 
+    }
     //client confirm all loanorder
     //奖惩策略：provider 平台得到奖励
     function loanAllConfirm(string idCardNo) public returns (bool) {
