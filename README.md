@@ -18,9 +18,9 @@
 
 涉及三个部分（见上图蓝色部分），分别是：
 
- - 智能合约
- - 征信对接SDK
- - DBLog无缝对接SDK
+ - 智能合约](https://github.com/kaolalicai/blockchain-hackathon)
+ - 征信对接SDK(https://github.com/kaolalicai/blockchain-credit-sdk)
+ - DBLog无缝对接SDK(https://github.com/kaolalicai/blockchain-DBLog2Blc.git)
 
 解决点：
 
