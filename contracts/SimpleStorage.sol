@@ -1,4 +1,4 @@
-pragma solidity ^0.4.17;
+pragma solidity ^0.4.22;
 // pragma experimental ABIEncoderV2;
 import "./BloggerCoin.sol";
 import "zeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
@@ -25,11 +25,11 @@ contract SimpleStorage is StandardToken {
         // mapping (string => LoanStruct) loan;
     }
     mapping(string => UserStruct) private UserStructs;
-    string public name = "BloggerCoin";
+    // string public name = "BloggerCoin";
     string public symbol = "BLC";
     uint8 public decimals = 4;
     uint256 public INITIAL_SUPPLY = 1000000;
-    function SimpleStorage(){
+    constructor() public {
       balances[msg.sender] = INITIAL_SUPPLY;
     }
 
@@ -75,10 +75,10 @@ contract SimpleStorage is StandardToken {
     }
     //获取通过 idCardNo 获取借款信息
     //return 完整的结构体
-    function get(address userAddr, string idCardNo, uint index)
+    function get(string idCardNo, uint index)
     public view returns(address provider, string loanid, uint amount,
     string loanTime, uint peroidDay, string repayStatus) {
-        LoanStruct lo = UserStructs[idCardNo].loan[index];
+        LoanStruct memory lo = UserStructs[idCardNo].loan[index];
         // downloadCost(userAddr, lo.provider);
         return (lo.provider, lo.loanid, UserStructs[idCardNo].amount, lo.loanTime, lo.peroidDay, lo.repayStatus);
     }
@@ -90,8 +90,8 @@ contract SimpleStorage is StandardToken {
         }
         return true;
     }
-    function compareStrings (string a, string b) view returns (bool) {
-       return keccak256(a) == keccak256(b);
+    function compareStrings (string a, string b) public pure returns (bool) {
+       return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
     }
     //添加黑名单
     //参数可以为空，但不全为空
@@ -105,14 +105,14 @@ contract SimpleStorage is StandardToken {
         BlackLists[idCardNo].phone = phone;
         return true;
     }
-    function downloadCost(address reader, address provider) returns (bool){
+    function downloadCost(address reader, address provider) public returns (bool){
         return transferF(reader, provider, 10);
     }
-    function uploadBonus(address provider) returns (bool){
+    function uploadBonus(address provider) public returns (bool){
         return transfer(provider,100);
     }
     // function agreementSettle(UserStruct us) returns (bool) {
-    function agreementSettle(string idCardNo, address provider, string repayStatus) returns (bool) {
+    function agreementSettle(string idCardNo, address provider, string repayStatus) public returns (bool) {
         address voter = msg.sender;
         assert(provider != voter); //自己不能disagree & agree自己
         if(compareStrings(repayStatus, "done") && isInBlackList(idCardNo)){
@@ -135,14 +135,14 @@ contract SimpleStorage is StandardToken {
     //  触发时机：有逾期数据上传时
     //  奖惩罚量: provider + 10, voter + 1
     //todo 逾期不一定坏账
-    function agree(address provider, address voter) returns (bool){
+    function agree(address provider, address voter) public returns (bool){
         transfer(provider, 10);
         transfer(voter, 1);
     }
     //奖惩策略：A平台(provider)作恶case: 已有黑名单，B平台(voter)放款了，借款人正常还款。
     //  触发时机：有正常还款数据上传时
     //  奖惩罚量: provider - 10 , voter + 10
-    function disagree(address provider, address voter) returns (bool){
+    function disagree(address provider, address voter) public returns (bool){
         transferF(provider, voter, 10);
     }
 }

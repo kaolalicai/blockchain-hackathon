@@ -1,4 +1,4 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.22;
 import "zeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
 
 contract BloggerCoin is StandardToken {
@@ -6,7 +6,7 @@ contract BloggerCoin is StandardToken {
   string public symbol = "BLC";
   uint8 public decimals = 4;
   uint256 public INITIAL_SUPPLY = 1000000;
-  function BloggerCoin() {
+  constructor() public {
     /* totalSupply = INITIAL_SUPPLY; */
     balances[msg.sender] = INITIAL_SUPPLY;
   }
